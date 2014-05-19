@@ -183,7 +183,6 @@ module SerializationHelper
       total_count = table_record_count(table)
       pages = (total_count.to_f / records_per_page).ceil - 1
       id = table_column_names(table).first
-      puts "@@@" + id
       boolean_columns = SerializationHelper::Utils.boolean_columns(table)
       quoted_table_name = SerializationHelper::Utils.quote_table(table)
 
