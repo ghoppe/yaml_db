@@ -79,11 +79,19 @@ module SerializationHelper
       if column_names.nil?
         return
       end
-      columns = column_names.map{|cn| ActiveRecord::Base.connection.columns(table).detect{|c| c.name == cn}}
-      quoted_column_names = column_names.map { |column| ActiveRecord::Base.connection.quote_column_name(column) }.join(',')
+      columns = column_names.map do |cn| 
+        ActiveRecord::Base.connection.columns(table).detect{|c| c.name == cn}
+      end
+      quoted_column_names = column_names.compact.map { |column| ActiveRecord::Base.connection.quote_column_name(column) }.join(',')
       quoted_table_name = SerializationHelper::Utils.quote_table(table)
+      # record = records.compact
       records.each do |record|
-        quoted_values = record.zip(columns).map{|c| ActiveRecord::Base.connection.quote(c.first, c.last)}.join(',')
+        quoted_values = record.zip(columns).map{|c| ActiveRecord::Base.connection.quote(c.first, c.last) unless c.first.nil?}.compact.join(',')
+        puts "@@@@"
+        puts quoted_table_name
+        puts quoted_column_names
+        puts quoted_values
+        puts "@@@@"
         ActiveRecord::Base.connection.execute("INSERT INTO #{quoted_table_name} (#{quoted_column_names}) VALUES (#{quoted_values})")
       end
     end
@@ -171,11 +179,11 @@ module SerializationHelper
       ActiveRecord::Base.connection.columns(table).map { |c| c.name }
     end
 
-
     def self.each_table_page(table, records_per_page=1000)
       total_count = table_record_count(table)
       pages = (total_count.to_f / records_per_page).ceil - 1
       id = table_column_names(table).first
+      puts "@@@" + id
       boolean_columns = SerializationHelper::Utils.boolean_columns(table)
       quoted_table_name = SerializationHelper::Utils.quote_table(table)
 
@@ -190,7 +198,5 @@ module SerializationHelper
     def self.table_record_count(table)
       ActiveRecord::Base.connection.select_one("SELECT COUNT(*) FROM #{SerializationHelper::Utils.quote_table(table)}").values.first.to_i
     end
-
   end
-
 end
