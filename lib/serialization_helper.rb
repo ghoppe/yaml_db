@@ -176,7 +176,7 @@ module SerializationHelper
     end
 
     def self.table_column_names(table)
-      ActiveRecord::Base.connection.columns(table).map { |c| c.name }
+      ActiveRecord::Base.connection.columns(table).map { |c| c.name unless c.name == "id"}
     end
 
     def self.each_table_page(table, records_per_page=1000)
