@@ -69,7 +69,7 @@ module SerializationHelper
     def self.load_table(table, data, truncate = true)
       column_names = data['columns']
       if truncate
-        truncate_table(table)
+        # truncate_table(table)
       end
       load_records(table, column_names, data['records'])
       reset_pk_sequence!(table)
